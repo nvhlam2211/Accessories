@@ -4,6 +4,11 @@ const { z } = require("zod");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
+const optionalEnvValue = z.preprocess(
+  value => value === "" ? undefined : value,
+  z.string().trim().min(1).optional(),
+);
+
 const schema = z.object({
   DB_URL: z.string().url()
     .refine(value => value.startsWith("postgres://") || value.startsWith("postgresql://"))
@@ -23,7 +28,10 @@ const schema = z.object({
     .optional(),
   ADMIN_NAME: z.string().trim().min(2).max(100).default("Quản trị viên"),
   API_PORT: z.coerce.number().int().positive().default(Number(process.env.PORT) || 4000),
-  WEB_ORIGIN: z.string().url().default("http://localhost:5173"),
+  WEB_ORIGIN: z.string().url().default("https://accessories-frontend-fawn.vercel.app"),
+  CLOUDINARY_CLOUD_NAME: optionalEnvValue,
+  CLOUDINARY_API_KEY: optionalEnvValue,
+  CLOUDINARY_API_SECRET: optionalEnvValue,
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 }).superRefine((config, context) => {
   const hasIndividualDatabaseConfig = [
@@ -37,6 +45,27 @@ const schema = z.object({
       code: z.ZodIssueCode.custom,
       path: ["DB_URL"],
       message: "Cần DB_URL hoặc cấu hình đầy đủ DB_HOST, DB_USENAME, DB_PASWORD và DB_NAME.",
+    });
+  }
+
+  const cloudinaryCredentials = [
+    config.CLOUDINARY_CLOUD_NAME,
+    config.CLOUDINARY_API_KEY,
+    config.CLOUDINARY_API_SECRET,
+  ];
+  const hasCloudinaryCredentials = cloudinaryCredentials.every(Boolean);
+  if (cloudinaryCredentials.some(Boolean) && !hasCloudinaryCredentials) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["CLOUDINARY_CLOUD_NAME"],
+      message: "Cần cấu hình đầy đủ CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY và CLOUDINARY_API_SECRET.",
+    });
+  }
+  if (config.NODE_ENV === "production" && !hasCloudinaryCredentials) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["CLOUDINARY_CLOUD_NAME"],
+      message: "Môi trường production cần cấu hình Cloudinary để lưu ảnh bền vững.",
     });
   }
 });

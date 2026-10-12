@@ -13,10 +13,14 @@ app.use(helmet());
 app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
-app.use("/uploads", express.static(path.resolve(__dirname, "uploads"), {
-  maxAge: "1d",
-  dotfiles: "deny",
-}));
+app.use(
+  "/uploads",
+  helmet.crossOriginResourcePolicy({ policy: "cross-origin" }),
+  express.static(path.resolve(__dirname, "uploads"), {
+    maxAge: "1d",
+    dotfiles: "deny",
+  }),
+);
 app.use("/api", apiRoutes);
 app.use(notFound);
 app.use(errorHandler);

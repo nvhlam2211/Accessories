@@ -15,13 +15,15 @@ async function start() {
     return;
   }
 
-  const server = app.listen(env.API_PORT, () => {
-    console.log(`API đang chạy tại http://localhost:${env.API_PORT}`);
+  const PORT = process.env.PORT || 4000;
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
   });
 
   async function shutdown(signal) {
     console.log(`${signal}: đang đóng API...`);
-    server.close(async error => {
+    server.close(async (error) => {
       try {
         await sequelize.close();
         if (error) {
@@ -39,7 +41,7 @@ async function start() {
   process.once("SIGTERM", () => void shutdown("SIGTERM"));
 }
 
-start().catch(async error => {
+start().catch(async (error) => {
   console.error("Không thể khởi động API:", error);
   try {
     await sequelize.close();
