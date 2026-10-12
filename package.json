@@ -1,0 +1,27 @@
+{
+  "name": "hairclip-shop-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch server.js",
+    "build": "node --check server.js && node --check app.js && node --check config/database.js && node --check config/env.js && node --check config/initAdmin.js && node --check config/syncDatabase.js && node --check models/index.js && node --check models/Sale.js && node --check models/SaleAudit.js && node --check controllers/auth.controller.js && node --check controllers/product.controller.js && node --check controllers/category.controller.js && node --check controllers/cart.controller.js && node --check controllers/admin.controller.js && node --check routes/index.js && node --check routes/auth.routes.js && node --check routes/product.routes.js && node --check routes/category.routes.js && node --check routes/cart.routes.js && node --check routes/admin.routes.js && node --check utils/productPrice.js && node --check middlewares/auth.middleware.js && node --check middlewares/upload.middleware.js && node --check middlewares/errorHandler.js",
+    "start": "node server.js",
+    "db:sync": "node server.js --sync-only"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.7.1",
+    "google-auth-library": "^11.2.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8",
+    "zod": "^3.24.2"
+  }
+}
